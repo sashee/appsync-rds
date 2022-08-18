@@ -40,6 +40,11 @@ resource "aws_rds_cluster" "cluster" {
   scaling_configuration {
     min_capacity = 1
   }
+  lifecycle {
+    ignore_changes = [
+      engine_version,
+    ]
+  }
 }
 
 resource "null_resource" "db_setup" {
@@ -154,7 +159,7 @@ resource "aws_appsync_resolver" "Query_groupById" {
 		"SELECT * FROM UserGroup WHERE id = :ID"
 	],
 	"variableMap": {
-		":ID": $util.toJson($ctx.args.id)
+		":ID": $util.toJson($ctx.args.id.replace("'", "''").replace("\", "\\"))
 	}
 }
 EOF
@@ -240,8 +245,8 @@ resource "aws_appsync_resolver" "Mutation_addUser" {
 	],
 	"variableMap": {
 		":ID": $util.toJson($id),
-		":NAME": $util.toJson($ctx.args.name),
-		":GROUP_ID": $util.toJson($ctx.args.groupId)
+		":NAME": $util.toJson($ctx.args.name.replace("'", "''").replace("\", "\\")),
+		":GROUP_ID": $util.toJson($ctx.args.groupId.replace("'", "''").replace("\", "\\"))
 	}
 }
 EOF
@@ -273,7 +278,7 @@ resource "aws_appsync_resolver" "Mutation_addGroup" {
 	],
 	"variableMap": {
 		":ID": $util.toJson($id),
-		":NAME": $util.toJson($ctx.args.name),
+		":NAME": $util.toJson($ctx.args.name.replace("'", "''").replace("\", "\\")),
 	}
 }
 EOF
