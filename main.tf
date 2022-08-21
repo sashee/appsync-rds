@@ -30,7 +30,6 @@ resource "aws_secretsmanager_secret_version" "db-pass-val" {
 
 resource "aws_rds_cluster" "cluster" {
   engine               = "aurora-mysql"
-  engine_version       = "5.7.mysql_aurora.2.07.1"
   engine_mode          = "serverless"
   database_name        = "mydb"
   master_username      = "admin"
@@ -39,11 +38,6 @@ resource "aws_rds_cluster" "cluster" {
   skip_final_snapshot  = true
   scaling_configuration {
     min_capacity = 1
-  }
-  lifecycle {
-    ignore_changes = [
-      engine_version,
-    ]
   }
 }
 
